@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SENTINEL VAULT CORE // Zero-Trust Cryptographic HUD</title>
+  <meta name="description" content="Production-Grade Zero-Trust Secret Vault & Cryptographic Telemetry Dashboard by carlosguedes-dev">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-sentinel-hud">
+  <!-- HUD Background Overlays -->
+  <div class="hud-grid-overlay" aria-hidden="true"></div>
+  <div class="hud-scanline" aria-hidden="true"></div>
+
+  <!-- Main HUD Application Shell -->
+  <div class="app-container">
+    
+    <!-- Top Telemetry Bar -->
+    <header class="hud-header">
+      <div class="hud-brand">
+        <div class="brand-badge">AEGIS-256</div>
+        <div>
+          <h1 class="brand-title">SENTINEL VAULT CORE</h1>
+          <p class="brand-subtitle">Zero-Trust Cryptographic Engine & Telemetry HUD</p>
+        </div>
+      </div>
+
+      <div class="hud-status-cluster">
+        <div class="status-node">
+          <span class="node-label">ENGINE</span>
+          <span class="node-value text-cyan" id="statEngine">AES-256-GCM</span>
+        </div>
+        <div class="status-node">
+          <span class="node-label">HASH/KDF</span>
+          <span class="node-value text-emerald" id="statKdf">scrypt (16k)</span>
+        </div>
+        <div class="status-node">
+          <span class="node-label">UPTIME</span>
+          <span class="node-value text-white" id="statUptime">0s</span>
+        </div>
+        <div class="status-node">
+          <span class="node-label">SYSTEM</span>
+          <span class="status-indicator live" id="statHealthDot"></span>
+          <span class="node-value text-emerald" id="statHealth">ACTIVE</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Workspace -->
+    <main class="hud-workspace">
+      
+      <!-- Left Panel: Authentication & Secret Ingestion -->
+      <section class="hud-panel panel-controls">
+        <div class="panel-header">
+          <h2 class="panel-title">// 01. AUTHENTICATION & ACCESS</h2>
+          <span class="badge-tag" id="authBadge">UNAUTHENTICATED</span>
+        </div>
+
+        <form id="authForm" class="hud-form">
+          <div class="input-group">
+            <label for="inputUsername">IDENTIFIER / USERNAME</label>
+            <input type="text" id="inputUsername" class="hud-input" value="sentinel.admin" required autocomplete="username">
+          </div>
+          <div class="input-group">
+            <label for="inputPassword">MASTER CREDENTIAL</label>
+            <input type="password" id="inputPassword" class="hud-input" value="SentinelAdmin#2026" required autocomplete="current-password">
+          </div>
+          <div class="btn-group">
+            <button type="submit" id="btnLogin" class="hud-btn btn-primary">AUTHENTICATE SESSION</button>
+            <button type="button" id="btnGenKey" class="hud-btn btn-secondary">GENERATE API KEY</button>
+          </div>
+        </form>
+
+        <div class="divider"></div>
+
+        <div class="panel-header">
+          <h2 class="panel-title">// 02. INGEST NEW ENCRYPTED SECRET</h2>
+        </div>
+
+        <form id="vaultForm" class="hud-form">
+          <div class="input-group">
+            <label for="inputKeyName">SECRET KEY NAME (VARIABLE)</label>
+            <input type="text" id="inputKeyName" class="hud-input" placeholder="e.g. STRIPE_API_SECRET_KEY" required>
+          </div>
+          <div class="input-group">
+            <label for="inputValue">PLAINTEXT VALUE (TO BE ENCRYPTED)</label>
+            <textarea id="inputValue" class="hud-textarea" rows="3" placeholder="Enter sensitive secret value here..." required></textarea>
+            <div class="entropy-meter">
+              <span>CALCULATED ENTROPY:</span>
+              <span id="entropyDisplay" class="text-cyan">0 bits</span>
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label for="selectEnv">TARGET ENVIRONMENT</label>
+              <select id="selectEnv" class="hud-select">
+                <option value="production">PRODUCTION</option>
+                <option value="staging">STAGING</option>
+                <option value="development">DEVELOPMENT</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="inputTags">TAGS (COMMA-SEPARATED)</label>
+              <input type="text" id="inputTags" class="hud-input" placeholder="api, payment, cloud">
+            </div>
+          </div>
+          <button type="submit" id="btnStoreSecret" class="hud-btn btn-cyan">ENCRYPT & COMMIT TO VAULT</button>
+        </form>
+      </section>
+
+      <!-- Right Panel: Vault Telemetry & Live Secret Catalog -->
+      <section class="hud-panel panel-vault">
+        <div class="panel-header">
+          <h2 class="panel-title">// 03. VAULTED SECRETS CATALOG (METADATA ONLY)</h2>
+          <div class="filter-controls">
+            <button class="filter-btn active" data-env="all">ALL</button>
+            <button class="filter-btn" data-env="production">PROD</button>
+            <button class="filter-btn" data-env="staging">STAGING</button>
+            <button class="filter-btn" data-env="development">DEV</button>
+            <button id="btnRefresh" class="hud-btn-mini">REFRESH</button>
+          </div>
+        </div>
+
+        <div id="secretsContainer" class="secrets-grid">
+          <div class="empty-state">
+            <div class="empty-icon">🛡️</div>
+            <p>Vault is initialized. Authenticate and store your first AES-256 encrypted secret.</p>
+          </div>
+        </div>
+
+        <!-- System Audit Log Console -->
+        <div class="audit-console">
+          <div class="console-header">
+            <span>// REAL-TIME AUDIT TELEMETRY STREAM</span>
+            <span class="status-indicator live"></span>
+          </div>
+          <div id="auditLogStream" class="console-body">
+            <div class="log-entry system">[SYSTEM_INIT] Zero-Trust Vault Kernel ready. AEAD Cipher loaded.</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Decryption Modal Dialog -->
+    <div id="decryptModal" class="hud-modal" aria-hidden="true">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 id="modalTitle" class="modal-title">AUTHENTICATED DECRYPTION</h3>
+          <button id="btnCloseModal" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-desc">Decryption executed via authenticated AES-256-GCM verification. Access recorded in audit log.</p>
+          <div class="input-group">
+            <label>PLAINTEXT VALUE</label>
+            <div class="secret-reveal-box">
+              <code id="revealedSecret" class="secret-code">...</code>
+              <button id="btnCopySecret" class="hud-btn-mini">COPY</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Toast Container -->
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

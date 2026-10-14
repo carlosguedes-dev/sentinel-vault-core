@@ -1,0 +1,44 @@
+{
+  "name": "sentinel-vault-core",
+  "version": "1.0.0",
+  "description": "Production-Grade Zero-Trust Secret Vault & Cryptographic Telemetry API with Cyberpunk HUD Dashboard",
+  "author": "carlosguedes-dev",
+  "license": "MIT",
+  "main": "dist/src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/src/index.js",
+    "test": "node --test dist/tests/**/*.test.js",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": [
+    "zero-trust",
+    "security-vault",
+    "aes-256-gcm",
+    "cryptography",
+    "scrypt",
+    "telemetry",
+    "hud-dashboard",
+    "rate-limiting",
+    "clean-architecture"
+  ],
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.13.9",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
